@@ -41,7 +41,7 @@ jobs:
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral/networking'
-        tg_command: 'run force-unlock force e24dea4c-c178-0f05-c4f2-d8301ec174a0'
+        tg_command: 'run force-unlock -- -force e24dea4c-c178-0f05-c4f2-d8301ec174a0'
 
     # - name: Plan
     #   uses: gruntwork-io/terragrunt-action@v3
