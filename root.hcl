@@ -108,10 +108,10 @@ generate "provider_azure" {
           source  = "hashicorp/azurerm"
           version = "~> 4.0"
         }
-        azuread = {
-          source  = "hashicorp/azuread"
-          version = "~> 3.0"
-        }
+        # azuread = {
+        #   source  = "hashicorp/azuread"
+        #   version = "~> 3.0"
+        # }
         azapi = {
           source  = "Azure/azapi"
           version = "~> 2.4"
@@ -156,15 +156,15 @@ generate "provider_azure" {
       }
     }
 
-    provider "azuread" {
-      # tenant_id = "${local.tenant_id}"
-      # client_id = "${local.client_id}"
+    # provider "azuread" {
+    #   # tenant_id = "${local.tenant_id}"
+    #   # client_id = "${local.client_id}"
       
-      # use_oidc  = true
+    #   # use_oidc  = true
       
-      # Allow using a Managed Identity if available (e.g. in local dev with Azure CLI logged in, or in CI/CD with a federated credential)
-      use_msi = true
-    }
+    #   # Allow using a Managed Identity if available (e.g. in local dev with Azure CLI logged in, or in CI/CD with a federated credential)
+    #   use_msi = true
+    # }
   EOF
 }
 
