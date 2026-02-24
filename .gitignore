@@ -1,0 +1,31 @@
+# Terragrunt cache directories
+**/.terragrunt-cache/
+**/.terraform/
+**/.terragrunt-stack/
+
+# Terraform state and plan files (state is in Azure Storage, never local)
+*.tfstate
+*.tfstate.backup
+*.tfplan
+
+# Auto-generated files (Terragrunt writes these into working dirs)
+**/backend.tf
+**/provider.tf
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Sensitive variable files
+*.auto.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Editor and OS artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
