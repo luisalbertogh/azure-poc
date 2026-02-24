@@ -25,8 +25,8 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     
     # Use mise.toml to specify versions.
-    - name: Install Terragrunt and Terraform
-      uses: gruntwork-io/terragrunt-action@v3
+    # - name: Install Terragrunt and Terraform
+    #   uses: gruntwork-io/terragrunt-action@v3
 
     - name: Check terragrunt HCL
       uses: gruntwork-io/terragrunt-action@v3
