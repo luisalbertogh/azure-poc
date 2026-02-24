@@ -141,7 +141,7 @@ generate "provider_azure" {
       # use_oidc = true   
 
       # Allow using a Managed Identity if available (e.g. in local dev with Azure CLI logged in, or in CI/CD with a federated credential)
-      use_msi = true   
+      # use_msi = true   
 
       features {
         # Do not destroy azurerm_key_vault resources after deletion and allow recovery.
