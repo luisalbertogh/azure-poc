@@ -108,10 +108,10 @@ generate "provider_azure" {
           source  = "hashicorp/azurerm"
           version = "~> 4.0"
         }
-        # azuread = {
-        #   source  = "hashicorp/azuread"
-        #   version = "~> 3.0"
-        # }
+        azuread = {
+          source  = "hashicorp/azuread"
+          version = "~> 3.0"
+        }
         azapi = {
           source  = "Azure/azapi"
           version = "~> 2.4"
@@ -129,20 +129,8 @@ generate "provider_azure" {
     provider "azurerm" {
       
       # Enforce Azure AD authentication over Shared Key for provisioning Storage Containers, Blobs, and other items.
-      # storage_use_azuread = true
+      storage_use_azuread = true
       
-      # Used for authentication to Azure for resource provisioning. Can be set via environment variables for CI/CD or local development.
-      # subscription_id = "${local.subscription_id}"
-      # tenant_id       = "${local.tenant_id}"
-      # client_id       = "${local.client_id}"
-
-      # Use OpenID Connect / Workload identity federation authentication for authentication to the storage account management and data plane
-      # ARM_OIDC_TOKEN env var supplies the token at runtime
-      # use_oidc = true   
-
-      # Allow using a Managed Identity if available (e.g. in local dev with Azure CLI logged in, or in CI/CD with a federated credential)
-      # use_msi = true   
-
       features {
         # Do not destroy azurerm_key_vault resources after deletion and allow recovery.
         key_vault {
@@ -156,15 +144,7 @@ generate "provider_azure" {
       }
     }
 
-    # provider "azuread" {
-    #   # tenant_id = "${local.tenant_id}"
-    #   # client_id = "${local.client_id}"
-      
-    #   # use_oidc  = true
-      
-    #   # Allow using a Managed Identity if available (e.g. in local dev with Azure CLI logged in, or in CI/CD with a federated credential)
-    #   use_msi = true
-    # }
+    provider "azuread" {}
   EOF
 }
 

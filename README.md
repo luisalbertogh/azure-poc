@@ -13,3 +13,10 @@
 5. Grant Storage Blob Data Contribute access to storage account to MI (for least privilge).
 
 6. St up Terragurn actions.
+
+
+# - name: Unlock
+    #   uses: gruntwork-io/terragrunt-action@v3
+    #   with:
+    #     tg_dir: 'environments/dev/spaincentral/networking'
+    #     tg_command: 'run force-unlock -- -force e24dea4c-c178-0f05-c4f2-d8301ec174a0'
