@@ -26,18 +26,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # - name: Azure Login
-    #   uses: azure/login@v2
-    #   with:
-    #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-    #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-    #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    - name: Validate
-      uses: gruntwork-io/terragrunt-action@v3
+    - name: Azure Login
+      uses: azure/login@v2
       with:
-        tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'stack run validate'
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+            az account show
+
+    # - name: Validate
+    #   uses: gruntwork-io/terragrunt-action@v3
+    #   with:
+    #     tg_dir: 'environments/dev/spaincentral'
+    #     tg_command: 'stack run validate'
     
     # - name: Unlock
     #   uses: gruntwork-io/terragrunt-action@v3
@@ -45,8 +52,8 @@ jobs:
     #     tg_dir: 'environments/dev/spaincentral/networking'
     #     tg_command: 'run force-unlock -- -force e24dea4c-c178-0f05-c4f2-d8301ec174a0'
 
-    - name: Plan
-      uses: gruntwork-io/terragrunt-action@v3
-      with:
-        tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'stack run plan'
+    # - name: Plan
+    #   uses: gruntwork-io/terragrunt-action@v3
+    #   with:
+    #     tg_dir: 'environments/dev/spaincentral'
+    #     tg_command: 'stack run plan'
