@@ -16,6 +16,7 @@ env:
     ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
     ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
     ARM_USE_MSI: true
+    ARM_MSI_API_VERSION: '2019-08-01'
     TF_LOG: debug
 
 jobs:
