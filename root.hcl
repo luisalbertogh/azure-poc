@@ -134,7 +134,7 @@ generate "provider_azure" {
 
       # Use OpenID Connect / Workload identity federation authentication for authentication to the storage account management and data plane
       # ARM_OIDC_TOKEN env var supplies the token at runtime
-      use_oidc = true   
+      # use_oidc = true   
 
       # Allow using a Managed Identity if available (e.g. in local dev with Azure CLI logged in, or in CI/CD with a federated credential)
       use_msi = true   
@@ -156,7 +156,7 @@ generate "provider_azure" {
       tenant_id = "${local.tenant_id}"
       client_id = "${local.client_id}"
       
-      use_oidc  = true
+      # use_oidc  = true
       
       # Allow using a Managed Identity if available (e.g. in local dev with Azure CLI logged in, or in CI/CD with a federated credential)
       use_msi = true
