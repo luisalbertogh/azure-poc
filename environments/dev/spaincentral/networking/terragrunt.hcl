@@ -24,6 +24,8 @@ inputs = {
   location  = include.root.locals.region_vars.locals.location
   tags      = merge(
     include.root.locals.common_tags, 
-    { Project = "POCs" }
+    { Project = "POCs",
+      Component = "Networking" 
+    }
   )
 }

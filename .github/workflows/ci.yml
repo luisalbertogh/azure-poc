@@ -24,23 +24,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Clean
-      uses: gruntwork-io/terragrunt-action@v3
-      with:
-        tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'stack clean'
-
     - name: Validate
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'stack run validate'
+        tg_command: 'run --all validate'
     
     - name: Plan
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'stack run plan --json-out-dir tfplan'
+        tg_command: 'run --all plan --json-out-dir tfplan'
     
     - name: Upload plan artifact
       uses: actions/upload-artifact@v6
@@ -63,9 +57,12 @@ jobs:
         name: tfplan
         path: environments/dev/spaincentral/tfplan
 
+    - name: debug
+      run: ls -la environments/dev/spaincentral/tfplan
+
     - name: Deploy
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'stack run apply --json-out-dir tfplan'
+        tg_command: 'run --all apply --json-out-dir tfplan'
 
