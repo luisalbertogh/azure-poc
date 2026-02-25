@@ -43,23 +43,28 @@ jobs:
         tg_command: 'stack run plan --json-out-dir tfplan'
     
     - name: Upload plan artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: tfplan
         path: environments/dev/spaincentral/tfplan
         retention-days: 1
         if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
   
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   environment: dev
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
     
-  #   - name: Deploy
-  #     uses: gruntwork-io/terragrunt-action@v3
-  #     with:
-  #       tg_dir: 'environments/dev/spaincentral'
-  #       tg_command: 'stack run apply'
+    - uses: actions/download-artifact@v8
+      with:
+        name: tfplan
+        path: environments/dev/spaincentral/tfplan
+
+    - name: Deploy
+      uses: gruntwork-io/terragrunt-action@v3
+      with:
+        tg_dir: 'environments/dev/spaincentral'
+        tg_command: 'stack run apply --json-out-dir tfplan'
 
