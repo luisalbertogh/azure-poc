@@ -58,7 +58,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - uses: actions/download-artifact@v8
+    - uses: actions/download-artifact@v7
       with:
         name: tfplan
         path: environments/dev/spaincentral/tfplan
