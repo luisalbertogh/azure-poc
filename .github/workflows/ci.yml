@@ -18,20 +18,40 @@ env:
     ARM_USE_OIDC: true
     
 jobs:
-  terraform:
+  validate-and-plan:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
+    - name: Clean
+      uses: gruntwork-io/terragrunt-action@v3
+      with:
+        tg_dir: 'environments/dev/spaincentral'
+        tg_command: 'stack clean'
+
     - name: Validate
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral'
         tg_command: 'stack run validate'
-
+    
     - name: Plan
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'stack run plan'
+        tg_command: 'stack run plan -- -out=tfplan'
+  
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   environment: dev
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+    
+  #   - name: Deploy
+  #     uses: gruntwork-io/terragrunt-action@v3
+  #     with:
+  #       tg_dir: 'environments/dev/spaincentral'
+  #       tg_command: 'stack run apply'
+
