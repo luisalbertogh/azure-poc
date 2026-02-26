@@ -15,14 +15,21 @@ jobs:
 - job: validate_and_plan
   displayName: 'Validate and Plan'
   steps:
-  - script: echo "Running tests"
-    displayName: 'Run tests'
   - checkout: self
     displayName: 'Checkout code'
+  
+  - task: AzureCLI@2
+    displayName: 'Validate and Plan with Terraform'
+    inputs:
+      azureSubscription: 'azure-pipelines-connection'  # Service connection name
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az account subscription list
 
 - job: deploy
   displayName: 'Deploy'
-  # dependsOn: validate-and-plan
+  dependsOn: validate_and_plan
   steps:
   - script: echo "Deploying to Azure"
     displayName: 'Deploy to Azure'
