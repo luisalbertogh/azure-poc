@@ -26,6 +26,9 @@ jobs:
       scriptLocation: 'inlineScript'
       inlineScript: |
         az account subscription list
+  
+  - script: az account subscription list
+    displayName: 'List Azure Subscriptions'
 
 - job: deploy
   displayName: 'Deploy'
