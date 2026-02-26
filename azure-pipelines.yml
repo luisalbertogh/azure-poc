@@ -66,6 +66,7 @@ jobs:
       azureSubscription: azure-pipelines-connection  # This is the name of the service connection you created in Azure DevOps. It should have permissions to access your Azure resources.
       addSpnToEnvironment: true
       inlineScript: |
+        env
         cd environments/dev/spaincentral
         terragrunt run --all validate
 
