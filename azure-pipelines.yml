@@ -3,17 +3,35 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+# Run on pushes to the main branch
 trigger:
 - main
 
+# Azure hosted agents are used to run the pipeline. See https://azure.microsoft.com/en-us/services/devops/pipelines/agents/ for more information.
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+jobs:
+- job: validate-and-plan
+  displayName: 'Validate and Plan'
+  steps:
+  - script: echo "Running tests"
+    displayName: 'Run tests'
+  - checkout: self
+    displayName: 'Checkout code'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- job: deploy
+  displayName: 'Deploy'
+  # dependsOn: validate-and-plan
+  steps:
+  - script: echo "Deploying to Azure"
+    displayName: 'Deploy to Azure'
+
+  # - task: AzureCLI@2
+  #   inputs:
+  #     azureSubscription: 'azure-terraform-connection'  # Service connection name
+  #     scriptType: 'bash'
+  #     scriptLocation: 'inlineScript'
+  #     inlineScript: |
+  #       terraform init
+  #       terraform plan -out=tfplan

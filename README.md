@@ -14,6 +14,7 @@
 
 6. St up Terragurn actions.
 
+7. I had to add a new federated credential for environments?
 
 # - name: Unlock
     #   uses: gruntwork-io/terragrunt-action@v3
