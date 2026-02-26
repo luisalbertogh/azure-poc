@@ -11,6 +11,7 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+# Jobs for the implicit stage. See https://learn.microsoft.com/en-us/azure/devops/pipelines/process/phases?view=azure-devops&tabs=yaml for more information on stages and jobs.
 jobs:
 - job: validate_and_plan
   displayName: 'Validate and Plan'
@@ -20,6 +21,7 @@ jobs:
     inputs:
       terraformVersion: '1.14.5'  # Specify the Terraform version you want to use
   
+  # Run bash script using tasks. See https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/bash-v3?view=azure-pipelines
   - task: Bash@3
     displayName: 'Install Terragrunt'
     inputs:
@@ -30,23 +32,29 @@ jobs:
         chmod +x terragrunt
         sudo mv terragrunt /usr/local/bin
   
+  # "script" runs a bash in Linux and a cmd in Windows. "bash" can also be used to run a bash script.
+  # See https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/steps-script?view=azure-pipelines and https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/steps-bash?view=azure-pipelines
   - script: |
       terraform --version
       terragrunt --version
     displayName: 'Print versions'
 
+  # Authenticate to Azure using Azure CLI task. This will set environment variables for Terraform/Terragrunt to use.
+  - task: AzureCLI@2
+    displayName: Authenticate Terraform
+    inputs:
+      scriptType: bash
+      scriptLocation: inlineScript
+      azureSubscription: azure-pipelines-connection  # This is the name of the service connection you created in Azure DevOps. It should have permissions to access your Azure resources.
+      addSpnToEnvironment: true
+      inlineScript: |
+        echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID]$(az account show --query id --output tsv)"
+        echo "##vso[task.setvariable variable=ARM_CLIENT_ID]$servicePrincipalId"
+        echo "##vso[task.setvariable variable=ARM_TENANT_ID]$tenantId"
+
   - checkout: self
     displayName: 'Checkout code'
-  
-  # - task: AzureCLI@2
-  #   displayName: 'Validate and Plan with Terraform'
-  #   inputs:
-  #     azureSubscription: 'azure-pipelines-connection'  # Service connection name
-  #     scriptType: 'bash'
-  #     scriptLocation: 'inlineScript'
-  #     inlineScript: |
-  #       az account subscription list
-
+   
 # - job: deploy
 #   displayName: 'Deploy'
 #   dependsOn: validate_and_plan
