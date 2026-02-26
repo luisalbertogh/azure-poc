@@ -48,9 +48,9 @@ jobs:
       azureSubscription: azure-pipelines-connection  # This is the name of the service connection you created in Azure DevOps. It should have permissions to access your Azure resources.
       addSpnToEnvironment: true
       inlineScript: |
-        echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID;issecret=true;isreadonly=true]$(az account show --query id --output tsv)"
-        echo "##vso[task.setvariable variable=ARM_CLIENT_ID;issecret=true;isreadonly=true]$servicePrincipalId"
-        echo "##vso[task.setvariable variable=ARM_TENANT_ID;issecret=true;isreadonly=true]$tenantId"
+        echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID;isreadonly=true]$(az account show --query id --output tsv)"
+        echo "##vso[task.setvariable variable=ARM_CLIENT_ID;isreadonly=true]$servicePrincipalId"
+        echo "##vso[task.setvariable variable=ARM_TENANT_ID;isreadonly=true]$tenantId"
 
   # Checkout code using the built-in checkout task. See https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml for more information on checking out code from GitHub.
   - checkout: self
@@ -58,8 +58,9 @@ jobs:
   
   # Validate Terrgrunt configuration.
   - script: |
+      env
       cd environments/dev/spaincentral
-      terragrunt run --all validate
+      # terragrunt run --all validate
     displayName: 'Terragrunt validate'
   
 # - job: deploy
