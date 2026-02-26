@@ -12,7 +12,7 @@ pool:
   vmImage: ubuntu-latest
 
 jobs:
-- job: validate-and-plan
+- job: validate_and_plan
   displayName: 'Validate and Plan'
   steps:
   - script: echo "Running tests"
