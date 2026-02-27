@@ -72,3 +72,11 @@ jobs:
       cd environments/dev/spaincentral
       terragrunt run --all plan --json-out-dir tfplan
     displayName: 'Terragrunt plan'
+
+  # Publish (upload) a file or directory as a named artifact for the current run.
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: environments/dev/spaincentral/tfplan
+      artifact: tfplan
+      publishLocation: pipeline
+    displayName: 'Publish tfplan artifact'

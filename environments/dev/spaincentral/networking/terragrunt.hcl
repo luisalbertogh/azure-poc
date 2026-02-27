@@ -25,7 +25,8 @@ inputs = {
   tags      = merge(
     include.root.locals.common_tags, 
     { Project = "POCs",
-      Component = "Networking" 
+      Component = "Networking"
+      CI = "Azure Pipelines" 
     }
   )
 }
