@@ -146,7 +146,7 @@ jobs:
         # Do Terragrunt apply configurations.
         - script: |
             cd environments/dev/spaincentral
-            export TF_LOG=DEBUG
-            terragrunt run --log-level debug --all apply --json-out-dir tfplan
+            # terragrunt run --all apply --json-out-dir tfplan
+            terragrunt run --all apply
           displayName: 'Terragrunt apply'
           
