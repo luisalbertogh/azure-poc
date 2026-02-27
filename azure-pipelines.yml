@@ -70,5 +70,5 @@ jobs:
   # Do Terragrunt plan configurations.
   - script: |
       cd environments/dev/spaincentral
-      run --all plan --json-out-dir tfplan
+      terragrunt run --all plan --json-out-dir tfplan
     displayName: 'Terragrunt plan'
