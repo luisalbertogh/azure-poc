@@ -13,9 +13,13 @@ pool:
 
 # Jobs for the implicit stage. See https://learn.microsoft.com/en-us/azure/devops/pipelines/process/phases?view=azure-devops&tabs=yaml for more information on stages and jobs.
 jobs:
+
+# Validate and plan job.
 - job: validate_and_plan
   displayName: 'Validate and Plan'
+  
   steps:
+  # Install Terraform using task.
   - task: TerraformInstaller@1
     displayName: 'Install Terraform'
     inputs:
@@ -48,38 +52,23 @@ jobs:
       azureSubscription: azure-pipelines-connection  # This is the name of the service connection you created in Azure DevOps. It should have permissions to access your Azure resources.
       addSpnToEnvironment: true
       inlineScript: |
-        echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID;isreadonly=true]$(az account show --query id --output tsv)"
-        echo "##vso[task.setvariable variable=ARM_CLIENT_ID;isreadonly=true]$servicePrincipalId"
-        echo "##vso[task.setvariable variable=ARM_TENANT_ID;isreadonly=true]$tenantId"
-        echo "##vso[task.setvariable variable=ARM_USE_OIDC;isreadonly=true]true"
-        echo "##vso[task.setvariable variable=ARM_OIDC_TOKEN;isreadonly=true]$idToken"
-
+        echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID;isreadonly=true;issecret=true]$(az account show --query id --output tsv)"
+        echo "##vso[task.setvariable variable=ARM_CLIENT_ID;isreadonly=true;issecret=true]$servicePrincipalId"
+        echo "##vso[task.setvariable variable=ARM_TENANT_ID;isreadonly=true;issecret=true]$tenantId"
+        echo "##vso[task.setvariable variable=ARM_USE_OIDC;isreadonly=true;issecret=true]true"
+        echo "##vso[task.setvariable variable=ARM_OIDC_TOKEN;isreadonly=true;issecret=true]$idToken"
   # Checkout code using the built-in checkout task. See https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml for more information on checking out code from GitHub.
   - checkout: self
     displayName: 'Checkout code'
-  
-  # - task: AzureCLI@2
-  #   displayName: Authenticate Terraform
-  #   inputs:
-  #     scriptType: bash
-  #     scriptLocation: inlineScript
-  #     azureSubscription: azure-pipelines-connection  # This is the name of the service connection you created in Azure DevOps. It should have permissions to access your Azure resources.
-  #     addSpnToEnvironment: true
-  #     inlineScript: |
-  #       env
-  #       cd environments/dev/spaincentral
-  #       terragrunt run --all validate
 
+  # Validate Terragrunt configurations.
   - script: |
-      env
       cd environments/dev/spaincentral
       terragrunt run --all validate
     displayName: 'Terragrunt validate'
   
-# - job: deploy
-#   displayName: 'Deploy'
-#   dependsOn: validate_and_plan
-#   steps:
-#   - script: echo "Deploying to Azure"
-#     displayName: 'Deploy to Azure'
-
+  # Do Terragrunt plan configurations.
+  - script: |
+      cd environments/dev/spaincentral
+      run --all plan --json-out-dir tfplan
+    displayName: 'Terragrunt plan'
