@@ -137,11 +137,11 @@ jobs:
     inputs:
       buildType: 'current'
       artifactName: 'tfplan' 
-      targetPath: '$(Pipeline.Workspace)/environments/dev/spaincentral' # Destination directory. Default: $(System.ArtifactsDirectory).
+      targetPath: 'environments/dev/spaincentral' # Destination directory. Default: $(System.ArtifactsDirectory).
   
   - script: |
-      ls -l $(Pipeline.Workspace)
-      ls -l $(Pipeline.Workspace)/environments/dev/spaincentral/tfplan
+      ls -l 
+      ls -l environments/dev/spaincentral
     displayName: 'List files'
 
   # Do Terragrunt plan configurations.
