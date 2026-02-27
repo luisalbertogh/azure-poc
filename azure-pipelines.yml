@@ -74,7 +74,7 @@ jobs:
       terragrunt run --all plan --json-out-dir tfplan
     displayName: 'Terragrunt plan'
 
-  # Publish (upload) a file or directory as a named artifact for the current run.
+  # Publish (upload) a file or directory as a named artifact for the current run. More in https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/publish-pipeline-artifact-v1?view=azure-pipelines
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: environments/dev/spaincentral/tfplan
@@ -131,17 +131,18 @@ jobs:
   - checkout: self
     displayName: 'Checkout code'
 
-  # Download TF plan.
-  - task: DownloadBuildArtifacts@1
+  # Download TF plan. More in https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/download-pipeline-artifact-v2?view=azure-pipelines
+  - task: DownloadPipelineArtifact@2
     displayName: 'Download TF plan'
     inputs:
+      buildType: 'current'
       artifactName: 'tfplan' 
-      downloadPath: 'environments/dev/spaincentral' # Destination directory. Default: $(System.ArtifactsDirectory).
+      targetPath: 'environments/dev/spaincentral' # Destination directory. Default: $(System.ArtifactsDirectory).
   
   - script: |
       cd environments/dev/spaincentral
       ls -l
-    displayName: 'Terragrunt apply'
+    displayName: 'List files'
 
   # Do Terragrunt plan configurations.
   # - script: |
