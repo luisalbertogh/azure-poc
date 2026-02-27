@@ -141,10 +141,13 @@ jobs:
         # Move artifacts to proper location
         - script: |
             mv $(Pipeline.Workspace)/tfplan environments/dev/spaincentral
+            ls -l environments/dev/spaincentral/
           displayName: 'Move TF plans'
 
         # Do Terragrunt apply configurations.
         - script: |
             cd environments/dev/spaincentral
+            export TF_LOG=DEBUG
             terragrunt run --all apply --json-out-dir tfplan
           displayName: 'Terragrunt apply'
+          
