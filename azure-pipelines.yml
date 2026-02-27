@@ -52,7 +52,7 @@ jobs:
         echo "##vso[task.setvariable variable=ARM_CLIENT_ID;isreadonly=true]$servicePrincipalId"
         echo "##vso[task.setvariable variable=ARM_TENANT_ID;isreadonly=true]$tenantId"
         echo "##vso[task.setvariable variable=ARM_USE_OIDC;isreadonly=true]true"
-        echo "##vso[task.setvariable variable=ARM_OIDC_TOKEN;isreadonly=true]$(az account get-access-token --resource "api://AzureADTokenExchange" --query accessToken -o tsv)"
+        echo "##vso[task.setvariable variable=ARM_OIDC_TOKEN;isreadonly=true]$idToken"
 
   # Checkout code using the built-in checkout task. See https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml for more information on checking out code from GitHub.
   - checkout: self
