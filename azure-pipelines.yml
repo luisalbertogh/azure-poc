@@ -133,10 +133,16 @@ jobs:
 
   # Download TF plan.
   - task: DownloadBuildArtifacts@1
+    displayName: 'Download TF plan'
     inputs:
       artifactName: 'tfplan' 
       downloadPath: 'environments/dev/spaincentral' # Destination directory. Default: $(System.ArtifactsDirectory).
-      
+  
+  - script: |
+      cd environments/dev/spaincentral
+      ls -l
+    displayName: 'Terragrunt apply'
+
   # Do Terragrunt plan configurations.
   # - script: |
   #     cd environments/dev/spaincentral
