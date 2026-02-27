@@ -146,5 +146,5 @@ jobs:
         # Do Terragrunt apply configurations.
         - script: |
             cd environments/dev/spaincentral
-            terragrunt run --all apply --json-out-dir tfplan --parallelism 1
+            terragrunt run --all apply --out-dir tfplan --non-interactive
           displayName: 'Terragrunt apply'
