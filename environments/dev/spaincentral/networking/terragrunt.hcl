@@ -26,7 +26,7 @@ inputs = {
     include.root.locals.common_tags, 
     { Project = "POCs",
       Component = "Networking"
-      CI = "Azure Pipelines" 
+      CI = "Azure Pipelinesss" 
     }
   )
 }
