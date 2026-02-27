@@ -138,12 +138,13 @@ jobs:
         - checkout: self
           displayName: 'Checkout code'
         
+        # Move artifacts to proper location
         - script: |
-            ls -l $(Pipeline.Workspace)/tfplan
-          displayName: 'List files'
+            mv $(Pipeline.Workspace)/tfplan environments/dev/spaincentral
+          displayName: 'Move TF plans'
 
-        # Do Terragrunt plan configurations.
-        # - script: |
-        #     cd environments/dev/spaincentral
-        #     terragrunt run --all apply --json-out-dir tfplan
-        #   displayName: 'Terragrunt apply'
+        # Do Terragrunt apply configurations.
+        - script: |
+            cd environments/dev/spaincentral
+            terragrunt run --all apply --json-out-dir tfplan
+          displayName: 'Terragrunt apply'
