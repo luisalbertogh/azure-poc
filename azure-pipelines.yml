@@ -146,7 +146,9 @@ jobs:
         # Do Terragrunt apply configurations.
         - script: |
             cd environments/dev/spaincentral
-            export TF_LOG=DEBUG
-            terragrunt run --all apply --json-out-dir tfplan --terragrunt-non-interactive --terragrunt-parallelism 1
+            terragrunt run --all apply --json-out-dir tfplan --non-interactive --parallelism 1
           displayName: 'Terragrunt apply'
+          env:
+            TF_LOG: DEBUG
+            TF_IN_AUTOMATION: true  # This environment variable tells Terraform that it's running in an automated environment, which can help with certain behaviors (like disabling interactive prompts).
           
