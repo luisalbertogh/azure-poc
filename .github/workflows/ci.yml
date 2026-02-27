@@ -34,7 +34,7 @@ jobs:
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'run --all plan --json-out-dir tfplan'
+        tg_command: 'run --all plan --out-dir tfplan'
     
     - name: Upload plan artifact
       uses: actions/upload-artifact@v6
@@ -57,12 +57,8 @@ jobs:
         name: tfplan
         path: environments/dev/spaincentral/tfplan
 
-    - name: debug
-      run: ls -la environments/dev/spaincentral/tfplan
-
     - name: Deploy
       uses: gruntwork-io/terragrunt-action@v3
       with:
         tg_dir: 'environments/dev/spaincentral'
-        tg_command: 'run --all apply --json-out-dir tfplan'
-
+        tg_command: 'run --all apply ---out-dir tfplan --non-interactive'
