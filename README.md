@@ -21,3 +21,6 @@
     #   with:
     #     tg_dir: 'environments/dev/spaincentral/networking'
     #     tg_command: 'run force-unlock -- -force e24dea4c-c178-0f05-c4f2-d8301ec174a0'
+
+
+IMPORTANT!!! to add the app registration to roles, search for app registration name!!! luisalbertogh-Tutorials-5fbaef3f-7f17-49ed-b299-87a7c8496743
