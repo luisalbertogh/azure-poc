@@ -1,26 +1,57 @@
 # azure-poc
 
-## Steps
+[![Azure](https://img.shields.io/badge/github-Azure_POC-blue?logo=github)](https://github.com/luisalbertogh/azure-poc)
+[![Workflows](https://img.shields.io/badge/Azure-Workflows-586123)](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents?versionId=free-pro-team%40latest&productId=copilot&restPage=reference%2Ccustom-agents-configuration)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-1. Create new storage account with public access for the Terraform backend.
+This repository contains a couple of POCs related to showcasing authentication against Azure from GitHub workflows and Azure DevOps pipelines, enforcing OIDC (federated credentials). More information can be found in [here](https://medium.com/@luisalbertogh/azure-authentication-from-cicd-pipelines-8111a7274e79).
 
-2. Create user managed indentity. Grant permissions (Contributor) on Subscription.
+The idea behind is to demonstrate how to do it, using two different set of resources (App Registration & Managed Identities). The repository is also using Terraform + Terragrunt.
 
-3. Create federeated credentials for MI.
+> **DISCLAIMER**
+>
+> There is no intention to build something production ready here. The used workflows lack of multiple features like branch strategy, templates, environments, etc. Do not use it as a reference for that.
 
-4. Set GH worklow.
+## Azure set up
 
-5. Grant Storage Blob Data Contribute access to storage account to MI (for least privilge).
+To use Terraform, the below is first created in Azure:
 
-6. St up Terragurn actions.
+1. Create new storage account with **public access** for the Terraform backend. **Anonymous access is disabled by default**. Enable Microsoft Entra ID for authorization by default.
 
-7. I had to add a new federated credential for environments?
+> Avoid public access always that possible, or restrict access using ACLs and security groups.
 
-# - name: Unlock
-    #   uses: gruntwork-io/terragrunt-action@v3
-    #   with:
-    #     tg_dir: 'environments/dev/spaincentral/networking'
-    #     tg_command: 'run force-unlock -- -force e24dea4c-c178-0f05-c4f2-d8301ec174a0'
+## GitHub workflows
 
+The main steps to create the GH workflow are enumarated below:
 
-IMPORTANT!!! to add the app registration to roles, search for app registration name!!! luisalbertogh-Tutorials-5fbaef3f-7f17-49ed-b299-87a7c8496743
+1. Create **user managed indentity (MI)**. Grant permissions (*Contributor*) on Subscription. Grant permissions (*Storage Blob Data Contribute*) on storage account with Terraform backend.
+
+2. Create federeated credentials for MI. Specify GH repository and/or branches/environment.
+
+3. Add GH actions secrets with **Client ID, Tenant ID and Subscription ID**.
+
+## Azure DevOps pipelines
+
+The main steps to create the Azure DevOps pipeline are listed out here:
+
+1. Create the **service connection** from Azure Devops. This will create the **app registration** and federated credentials.
+
+2. Grant *Contributor* permissions on the Subscription to the **app registration**. The same for *Storage Blob Data Contribute* on Terraform backend storage account.
+
+> IMPORTANT: to add the app registration to roles, search for app registration name!!!
+
+3. Use the configured **service connection** from the **Azure DevOps pipeline** to authenticate.
+
+## Useful commands
+
+This section contains useful commands to include as part of these pipelines for different purposes.
+
+### Unlock Terraform state
+
+```yaml
+- name: Unlock
+  uses: gruntwork-io/terragrunt-action@v3
+  with:
+    tg_dir: 'environments/dev/spaincentral/networking'
+    tg_command: 'run force-unlock -- -force <lock-id>'
+```
