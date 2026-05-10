@@ -55,3 +55,9 @@ This section contains useful commands to include as part of these pipelines for 
     tg_dir: 'environments/dev/spaincentral/networking'
     tg_command: 'run force-unlock -- -force <lock-id>'
 ```
+
+
+
+See the Terraform/Terragrunt infrastructure I have under the azure-poc project. I am currently deploying some resource already. I need a new Terraform module and Terragrunt unit that deploy a new blob storage. I already have a storage account in my Azure subscription, named "stgterraformlagh". If you need details about the tenant and subscription, please, ask me. The new blob storage can be called "images" and it will be used to upload images using the Azure console. Then, the images will be used internally within the same subscription, so no public access beside the Azure console should be allowed. I also need some lifecycle policy that moves images located under the path "processed" inside the blob container from hot to archive after the minimum adays allowed.
+
+Can you create all the needed Terraform and Terragrunt code to add this new resource?

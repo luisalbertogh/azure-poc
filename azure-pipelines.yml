@@ -6,6 +6,7 @@
 # Run on pushes to the main branch
 trigger:
 - main
+- feature/*
 
 # Azure hosted agents are used to run the pipeline. See https://azure.microsoft.com/en-us/services/devops/pipelines/agents/ for more information.
 pool:
@@ -86,6 +87,7 @@ jobs:
 - deployment: deploy
   displayName: 'Deploy'
   dependsOn: validate_and_plan
+  if: refs/heads/main  # Only run this job for pushes to the main branch.
 
   # Azure DevOps environment.
   environment: 'dev'
