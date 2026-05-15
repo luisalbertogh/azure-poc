@@ -14,19 +14,19 @@ include "root" {
 }
 
 include "envcommon" {
-  path   = find_in_parent_folders("_envcommon/networking.hcl")
-  expose = true
+  path           = find_in_parent_folders("_envcommon/networking.hcl")
+  expose         = true
   merge_strategy = "deep"
 }
 
 inputs = {
-  rg_name   = include.root.locals.env_vars.locals.rg_name
-  location  = include.root.locals.region_vars.locals.location
-  tags      = merge(
-    include.root.locals.common_tags, 
-    { Project = "POCs",
+  rg_name  = include.root.locals.env_vars.locals.rg_name
+  location = include.root.locals.region_vars.locals.location
+  tags = merge(
+    include.root.locals.common_tags,
+    { Project   = "POCs",
       Component = "Networking"
-      CI = "Azure Pipelinesss" 
+      CI        = "Azure Pipelinesss"
     }
   )
 }

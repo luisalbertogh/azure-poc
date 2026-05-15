@@ -15,7 +15,7 @@ locals {
   # referenced here with get_env().
   # ---------------------------------------------------------------------------
   subscription_id = get_env("ARM_SUBSCRIPTION_ID", "00000000-0000-0000-0000-000000000000")
-  tenant_id       = get_env("ARM_TENANT_ID",       "00000000-0000-0000-0000-000000000000")
+  tenant_id       = get_env("ARM_TENANT_ID", "00000000-0000-0000-0000-000000000000")
 
   # The OIDC-enabled Service Principal / Workload Identity client ID for DEV.
   # The actual OIDC token (ARM_OIDC_TOKEN) is injected by the CI/CD runtime.
@@ -25,5 +25,5 @@ locals {
   vnet_address_space = "10.10.0.0/16"
 
   # Main Resource group name
-  rg_name   = "rg-poc-dev"
+  rg_name = "rg-poc-dev"
 }

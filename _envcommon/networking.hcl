@@ -27,10 +27,10 @@ locals {
 # Remote Terraform module – pinned to a specific tag for reproducibility
 terraform {
   #source = "git::https://github.com/myorg/terraform-azure-modules.git//modules/networking?ref=v1.3.0"
-  source = "../../../../catalog//tf-modules/networking"  # Path is from where the unit is located (/networking)
+  source = "../../../../catalog//tf-modules/networking" # Path is from where the unit is located (/networking)
 }
 
 inputs = {
-  location            = local.location
-  environment         = local.environment
+  location    = local.location
+  environment = local.environment
 }

@@ -7,5 +7,5 @@
 
 locals {
   location       = "spaincentral"
-  location_short = "esc"   # Used in resource naming conventions
+  location_short = "esc" # Used in resource naming conventions
 }

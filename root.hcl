@@ -26,7 +26,7 @@ locals {
   environment     = local.env_vars.locals.environment
   subscription_id = local.env_vars.locals.subscription_id
   tenant_id       = local.env_vars.locals.tenant_id
-  client_id       = local.env_vars.locals.client_id   # OIDC: Service Principal / Managed Identity App ID
+  client_id       = local.env_vars.locals.client_id # OIDC: Service Principal / Managed Identity App ID
   location        = local.region_vars.locals.location
 
   # Remote state storage (shared Azure Storage Account – must be pre-provisioned)
@@ -70,7 +70,7 @@ locals {
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite_terragrunt"
-  contents = <<EOF
+  contents  = <<EOF
 terraform {
   backend "azurerm" {
     use_oidc             = true                               
@@ -146,6 +146,20 @@ generate "provider_azure" {
 
     provider "azuread" {}
   EOF
+}
+
+# ---------------------------------------------------------------------------
+# Offline validate hook: when the env var OFFLINE_VALIDATE=true is set, every
+# `terraform init` invoked through Terragrunt is forced to use -backend=false,
+# so `terragrunt run --all validate` works without contacting the remote state
+# backend. Terragrunt's include logic merges `extra_arguments` from this root
+# into each child unit's own `terraform { source = ... }` block automatically.
+# ---------------------------------------------------------------------------
+terraform {
+  extra_arguments "offline_validate" {
+    commands  = ["init"]
+    arguments = get_env("OFFLINE_VALIDATE", "false") == "true" ? ["-backend=false"] : []
+  }
 }
 
 # ---------------------------------------------------------------------------
