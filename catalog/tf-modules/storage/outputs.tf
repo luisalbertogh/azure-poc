@@ -20,5 +20,5 @@ output "container_name" {
 
 output "blob_endpoint" {
   description = "Primary blob endpoint of the storage account."
-  value       = module.storage_account.fqdn["blob"]
+  value       = module.storage_account.fqdn
 }
