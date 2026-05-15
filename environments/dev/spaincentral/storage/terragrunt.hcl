@@ -22,12 +22,17 @@ include "envcommon" {
 dependency "networking" {
   config_path = "../networking"
 
+  # Mocks exist ONLY so `validate` and `init` can run before networking has
+  # been applied (and before its outputs land in state). `plan` and `apply`
+  # are intentionally NOT in the allowed list, so any missing real output
+  # surfaces as an error instead of silently falling back to fake values.
   mock_outputs = {
     resource_group_id       = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-mock"
     resource_group_name     = "rg-mock"
     resource_group_location = "spaincentral"
   }
-  mock_outputs_allowed_terraform_commands = ["validate", "plan", "init", "fmt"]
+  mock_outputs_allowed_terraform_commands = ["validate", "init", "fmt"]
+  mock_outputs_merge_with_state           = false
 }
 
 inputs = {
