@@ -26,7 +26,7 @@ locals {
   environment     = local.env_vars.locals.environment
   subscription_id = local.env_vars.locals.subscription_id
   tenant_id       = local.env_vars.locals.tenant_id
-  client_id       = local.env_vars.locals.client_id   # OIDC: Service Principal / Managed Identity App ID
+  client_id       = local.env_vars.locals.client_id # OIDC: Service Principal / Managed Identity App ID
   location        = local.region_vars.locals.location
 
   # Remote state storage (shared Azure Storage Account – must be pre-provisioned)
@@ -70,7 +70,7 @@ locals {
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite_terragrunt"
-  contents = <<EOF
+  contents  = <<EOF
 terraform {
   backend "azurerm" {
     use_oidc             = true                               
