@@ -149,6 +149,20 @@ generate "provider_azure" {
 }
 
 # ---------------------------------------------------------------------------
+# Offline validate hook: when the env var OFFLINE_VALIDATE=true is set, every
+# `terraform init` invoked through Terragrunt is forced to use -backend=false,
+# so `terragrunt run --all validate` works without contacting the remote state
+# backend. Terragrunt's include logic merges `extra_arguments` from this root
+# into each child unit's own `terraform { source = ... }` block automatically.
+# ---------------------------------------------------------------------------
+terraform {
+  extra_arguments "offline_validate" {
+    commands  = ["init"]
+    arguments = get_env("OFFLINE_VALIDATE", "false") == "true" ? ["-backend=false"] : []
+  }
+}
+
+# ---------------------------------------------------------------------------
 # Common inputs: injected into every unit automatically.
 # Units can override these values in their own inputs block.
 # ---------------------------------------------------------------------------

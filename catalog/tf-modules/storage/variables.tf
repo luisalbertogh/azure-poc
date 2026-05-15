@@ -35,8 +35,12 @@ variable "container_name" {
   default     = "images"
 
   validation {
-    condition     = can(regex("^[a-z0-9](?:[a-z0-9]|-(?!-)){1,61}[a-z0-9]", var.container_name))
-    error_message = "container_name must be 3-63 chars, lowercase, alphanumeric or single hyphens, starting/ending with a letter or digit."
+    condition = (
+      length(var.container_name) >= 3 &&
+      length(var.container_name) <= 63 &&
+      can(regex("^[a-z0-9]+(-[a-z0-9]+)*$", var.container_name))
+    )
+    error_message = "container_name must be 3-63 chars, lowercase alphanumeric with single hyphens between groups, starting and ending with a letter or digit."
   }
 }
 
