@@ -21,11 +21,11 @@ module "virtual_network" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm"
   version = "~> 0.7"
 
-  name                = "vnet-poc-${var.environment}"
-  location            = var.location
-  resource_group_name = module.resource_group.name
-  address_space       = [var.vnet_address_space]
-  tags                = var.tags
+  name          = "vnet-poc-${var.environment}"
+  location      = var.location
+  parent_id     = module.resource_group.resource_id
+  address_space = [var.vnet_address_space]
+  tags          = var.tags
 
   enable_telemetry = false
 
