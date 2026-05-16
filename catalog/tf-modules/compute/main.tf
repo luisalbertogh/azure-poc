@@ -1,12 +1,7 @@
 # ==============================================================================
-# Storage Account – dedicated to the Azure Function runtime and deployment
-# ------------------------------------------------------------------------------
-# - Shared key access is disabled → all data plane operations use Entra ID
-# - Public network access is allowed so the CI/CD pipeline can upload the
-#   deployment package blob without needing VNet peering.
-# - The function app identity is granted Storage Blob Data Owner, Storage
-#   Queue Data Contributor, and Storage Table Data Contributor later in this
-#   module so the runtime can operate without connection strings.
+# Suffix – stable random string for unique resource names (Log Analytics,
+# Application Insights). Keyed to the resource group so it only rotates if
+# the owning resource group is replaced.
 # ==============================================================================
 resource "random_string" "fn_storage_suffix" {
   length  = 6
@@ -15,44 +10,15 @@ resource "random_string" "fn_storage_suffix" {
   numeric = true
 
   keepers = {
-    # Rotate the suffix only if the owning resource group changes
     rg_id = var.rg_id
   }
 }
 
 locals {
-  fn_storage_account_name   = "stgfn${var.environment}${random_string.fn_storage_suffix.result}"
+  # The deployment package container lives inside the shared images storage
+  # account (provided by the storage unit dependency). No dedicated function
+  # storage account is created – the function runtime re-uses the same account.
   deployment_container_name = "deploymentpackage"
-}
-
-module "fn_storage_account" {
-  source  = "Azure/avm-res-storage-storageaccount/azurerm"
-  version = "~> 0.6"
-
-  name      = local.fn_storage_account_name
-  parent_id = var.rg_id
-  location  = var.location
-  tags      = var.tags
-
-  account_kind             = "StorageV2"
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  access_tier              = "Hot"
-
-  min_tls_version                   = "TLS1_2"
-  shared_access_key_enabled         = false
-  allow_nested_items_to_be_public   = false
-  public_network_access_enabled     = true
-  default_to_oauth_authentication   = true
-  infrastructure_encryption_enabled = true
-
-  # Allow Azure services (function runtime) and CI/CD uploads
-  network_rules = {
-    default_action = "Allow"
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-  }
-
-  enable_telemetry = false
 }
 
 # ==============================================================================
@@ -60,7 +26,7 @@ module "fn_storage_account" {
 # ==============================================================================
 resource "azurerm_storage_container" "deployment" {
   name                  = local.deployment_container_name
-  storage_account_id    = module.fn_storage_account.resource_id
+  storage_account_id    = var.images_storage_account_id
   container_access_type = "private"
 }
 
@@ -77,7 +43,7 @@ data "archive_file" "hello_world" {
 
 resource "azurerm_storage_blob" "function_package" {
   name                   = "function-src.zip"
-  storage_account_name   = module.fn_storage_account.name
+  storage_account_name   = var.images_storage_account_name
   storage_container_name = azurerm_storage_container.deployment.name
   type                   = "Block"
   source                 = data.archive_file.hello_world.output_path
@@ -153,7 +119,7 @@ resource "azurerm_function_app_flex_consumption" "main" {
 
   # The function runtime reads its code package from this container
   storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "https://${module.fn_storage_account.name}.blob.core.windows.net/${azurerm_storage_container.deployment.name}"
+  storage_container_endpoint  = "https://${var.images_storage_account_name}.blob.core.windows.net/${azurerm_storage_container.deployment.name}"
   storage_authentication_type = "SystemAssignedIdentity"
 
   runtime_name    = "python"
@@ -184,11 +150,12 @@ resource "azurerm_function_app_flex_consumption" "main" {
   }
 
   app_settings = {
-    # Identity-based storage access (no connection strings, no shared keys)
-    "AzureWebJobsStorage__accountName"    = module.fn_storage_account.name
-    "AzureWebJobsStorage__blobServiceUri"  = "https://${module.fn_storage_account.name}.blob.core.windows.net"
-    "AzureWebJobsStorage__queueServiceUri" = "https://${module.fn_storage_account.name}.queue.core.windows.net"
-    "AzureWebJobsStorage__tableServiceUri" = "https://${module.fn_storage_account.name}.table.core.windows.net"
+    # Identity-based storage access – re-uses the shared images storage account
+    # (no dedicated function storage account, no connection strings or shared keys)
+    "AzureWebJobsStorage__accountName"    = var.images_storage_account_name
+    "AzureWebJobsStorage__blobServiceUri"  = "https://${var.images_storage_account_name}.blob.core.windows.net"
+    "AzureWebJobsStorage__queueServiceUri" = "https://${var.images_storage_account_name}.queue.core.windows.net"
+    "AzureWebJobsStorage__tableServiceUri" = "https://${var.images_storage_account_name}.table.core.windows.net"
     "AzureWebJobsStorage__credential"      = "managedidentity"
 
     # Images storage account (set by the storage unit dependency)
@@ -211,39 +178,30 @@ resource "azurerm_function_app_flex_consumption" "main" {
 }
 
 # ==============================================================================
-# Role assignments – function runtime storage account
-# The system identity needs these three roles on its OWN storage account
-# for the runtime to operate correctly (no connection strings).
+# Role assignments – shared storage account (images + function runtime)
+# The function runtime re-uses the images storage account for its internal
+# state (host ID, trigger leases, deployment package container). Three roles
+# are required for the runtime to operate without connection strings.
+# NOTE: Storage Blob Data Owner is intentionally elevated vs Contributor –
+# the Azure Functions runtime requires it to manage host lease blobs.
 # ==============================================================================
 resource "azurerm_role_assignment" "fn_storage_blob_owner" {
-  scope                = module.fn_storage_account.resource_id
+  scope                = var.images_storage_account_id
   role_definition_name = "Storage Blob Data Owner"
   principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
   principal_type       = "ServicePrincipal"
 }
 
 resource "azurerm_role_assignment" "fn_storage_queue_contributor" {
-  scope                = module.fn_storage_account.resource_id
+  scope                = var.images_storage_account_id
   role_definition_name = "Storage Queue Data Contributor"
   principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
   principal_type       = "ServicePrincipal"
 }
 
 resource "azurerm_role_assignment" "fn_storage_table_contributor" {
-  scope                = module.fn_storage_account.resource_id
-  role_definition_name = "Storage Table Data Contributor"
-  principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
-  principal_type       = "ServicePrincipal"
-}
-
-# ==============================================================================
-# Role assignment – images storage account (provisioned by the storage unit)
-# Storage Blob Data Contributor allows the function to read and write the
-# images container without using shared key access.
-# ==============================================================================
-resource "azurerm_role_assignment" "fn_images_storage_contributor" {
   scope                = var.images_storage_account_id
-  role_definition_name = "Storage Blob Data Contributor"
+  role_definition_name = "Storage Table Data Contributor"
   principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
   principal_type       = "ServicePrincipal"
 }
