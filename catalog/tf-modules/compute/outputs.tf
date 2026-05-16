@@ -18,16 +18,6 @@ output "function_app_default_hostname" {
   value       = azurerm_function_app_flex_consumption.main.default_hostname
 }
 
-output "fn_storage_account_id" {
-  description = "Resource ID of the Function App's dedicated storage account."
-  value       = module.fn_storage_account.resource_id
-}
-
-output "fn_storage_account_name" {
-  description = "Name of the Function App's dedicated storage account."
-  value       = module.fn_storage_account.name
-}
-
 output "application_insights_connection_string" {
   description = "Application Insights connection string for the Function App."
   value       = azurerm_application_insights.main.connection_string
