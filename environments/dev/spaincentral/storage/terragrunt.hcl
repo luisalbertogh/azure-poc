@@ -27,7 +27,7 @@ dependency "networking" {
     resource_group_name     = "rg-mock"
     resource_group_location = "spaincentral"
   }
-  mock_outputs_allowed_terraform_commands = ["validate", "init", "fmt"]
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "init", "fmt"]
 }
 
 inputs = {

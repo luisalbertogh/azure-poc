@@ -39,7 +39,7 @@ dependency "networking" {
     functions_subnet_id         = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-mock/providers/Microsoft.Network/virtualNetworks/vnet-mock/subnets/snet-functions"
     private_endpoints_subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-mock/providers/Microsoft.Network/virtualNetworks/vnet-mock/subnets/snet-pe"
   }
-  mock_outputs_allowed_terraform_commands  = ["validate", "init", "fmt"]
+  mock_outputs_allowed_terraform_commands  = ["validate", "plan", "init", "fmt"]
   mock_outputs_merge_strategy_with_state  = "shallow"
 }
 
@@ -54,7 +54,7 @@ dependency "storage" {
     storage_account_name = "stgmock"
     container_name       = "images"
   }
-  mock_outputs_allowed_terraform_commands = ["validate", "init", "fmt"]
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "init", "fmt"]
   mock_outputs_merge_strategy_with_state  = "shallow"
 }
 
