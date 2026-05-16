@@ -22,12 +22,31 @@ locals {
 }
 
 # ==============================================================================
+# Current Terraform runner identity
+# Used to grant the pipeline service principal data-plane access on the storage
+# account. Required because shared_access_key_enabled = false on the account,
+# so ALL data-plane operations (container create, blob upload) must use OAuth.
+# Without this role assignment the provider gets 403 when it tries to check or
+# write the deployment zip blob.
+# ==============================================================================
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_role_assignment" "deployer_blob_contributor" {
+  scope                = var.images_storage_account_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
+  principal_type       = "ServicePrincipal"
+}
+
+# ==============================================================================
 # Storage container – holds the function deployment package (zip blob)
 # ==============================================================================
 resource "azurerm_storage_container" "deployment" {
   name                  = local.deployment_container_name
   storage_account_id    = var.images_storage_account_id
   container_access_type = "private"
+
+  depends_on = [azurerm_role_assignment.deployer_blob_contributor]
 }
 
 # ==============================================================================
