@@ -31,12 +31,12 @@ locals {
 # ==============================================================================
 data "azurerm_client_config" "current" {}
 
-resource "azurerm_role_assignment" "deployer_blob_contributor" {
-  scope                = var.images_storage_account_id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = data.azurerm_client_config.current.object_id
-  principal_type       = "ServicePrincipal"
-}
+# resource "azurerm_role_assignment" "deployer_blob_contributor" {
+#   scope                = var.images_storage_account_id
+#   role_definition_name = "Storage Blob Data Contributor"
+#   principal_id         = data.azurerm_client_config.current.object_id
+#   principal_type       = "ServicePrincipal"
+# }
 
 # ==============================================================================
 # Storage container – holds the function deployment package (zip blob)
@@ -46,7 +46,7 @@ resource "azurerm_storage_container" "deployment" {
   storage_account_id    = var.images_storage_account_id
   container_access_type = "private"
 
-  depends_on = [azurerm_role_assignment.deployer_blob_contributor]
+  # depends_on = [azurerm_role_assignment.deployer_blob_contributor]
 }
 
 # ==============================================================================
