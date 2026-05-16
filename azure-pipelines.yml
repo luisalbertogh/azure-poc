@@ -23,7 +23,7 @@ jobs:
 
 # Validate and plan job.
 - job: validate_and_plan
-  displayName: 'Validate and Plan'
+  displayName: 'Validate and Plan Infrastructure'
   
   steps:
   # Install Terraform using task.
@@ -80,6 +80,7 @@ jobs:
       cd environments/dev/spaincentral
       terragrunt run --all plan --out-dir tfplan
     displayName: 'Terragrunt plan'
+    condition: or(eq(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))  # Run plan for PRs and pushes to main.
 
   # Publish (upload) a file or directory as a named artifact for the current run. More in https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/publish-pipeline-artifact-v1?view=azure-pipelines
   - task: PublishPipelineArtifact@1
@@ -88,6 +89,7 @@ jobs:
       artifact: tfplan
       publishLocation: pipeline
     displayName: 'Publish tfplan artifact'
+    condition: or(eq(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))  # Publish tfplan for PRs and pushes to main.
 
 # Deployment job. See https://learn.microsoft.com/en-us/azure/devops/pipelines/process/deployment-jobs?view=azure-devops#examples
 - deployment: deploy
