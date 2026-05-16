@@ -21,9 +21,12 @@ pool:
 # Jobs for the implicit stage. See https://learn.microsoft.com/en-us/azure/devops/pipelines/process/phases?view=azure-devops&tabs=yaml for more information on stages and jobs.
 jobs:
 
-# Validate and plan job.
+# Validate and plan job – runs on pull requests only.
+# On pushes to main the deploy job runs directly; validate is redundant
+# since the code was already validated on the PR that merged it.
 - job: validate_and_plan
   displayName: 'Validate and Plan Infrastructure'
+  condition: eq(variables['Build.Reason'], 'PullRequest')
   
   steps:
   # Install Terraform using task.
@@ -80,7 +83,7 @@ jobs:
       cd environments/dev/spaincentral
       terragrunt run --all plan --out-dir tfplan
     displayName: 'Terragrunt plan'
-    condition: or(eq(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))  # Run plan for PRs and pushes to main.
+    condition: eq(variables['Build.Reason'], 'PullRequest')  # Only run plan for PRs.
 
   # Publish (upload) a file or directory as a named artifact for the current run. More in https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/publish-pipeline-artifact-v1?view=azure-pipelines
   - task: PublishPipelineArtifact@1
@@ -89,12 +92,11 @@ jobs:
       artifact: tfplan
       publishLocation: pipeline
     displayName: 'Publish tfplan artifact'
-    condition: or(eq(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))  # Publish tfplan for PRs and pushes to main.
+    condition: eq(variables['Build.Reason'], 'PullRequest')  # Only publish the plan artifact for PRs.
 
 # Deployment job. See https://learn.microsoft.com/en-us/azure/devops/pipelines/process/deployment-jobs?view=azure-devops#examples
 - deployment: deploy
   displayName: 'Deploy'
-  dependsOn: validate_and_plan
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))  # Only run this job for pushes to the main branch.
 
   # Azure DevOps environment.
