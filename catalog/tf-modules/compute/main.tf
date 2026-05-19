@@ -186,6 +186,15 @@ resource "azurerm_function_app_flex_consumption" "main" {
 
     # Azure AI Foundry Content Understanding endpoint (optional)
     "CONTENT_UNDERSTANDING_ENDPOINT" = var.foundry_content_understanding_endpoint
+
+    # Event Hub connection – identity-based (no SAS connection strings).
+    # EventHubConnection__fullyQualifiedNamespace tells the runtime to use
+    # managed identity for the "EventHubConnection" binding connection name.
+    # Set when the eventhub unit is provisioned.
+    "EventHubConnection__fullyQualifiedNamespace" = var.event_hub_namespace_fqdn
+    "EventHubConnection__credential"              = "managedidentity"
+    "EVENT_HUB_NAME"                              = var.event_hub_name
+    "EVENT_HUB_CONSUMER_GROUP"                    = var.event_hub_consumer_group
   }
 
   tags = var.tags
@@ -267,6 +276,20 @@ resource "azurerm_role_assignment" "fn_foundry_user" {
   count                = var.foundry_account_id != "" ? 1 : 0
   scope                = var.foundry_account_id
   role_definition_name = "Cognitive Services User"
+  principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+# ==============================================================================
+# Role assignment – Event Hub (data-plane RBAC)
+# "Azure Event Hubs Data Receiver" allows the function identity to read events
+# from the Event Hub without SAS connection strings. Scoped to the specific
+# Event Hub resource (principle of least privilege).
+# ==============================================================================
+resource "azurerm_role_assignment" "fn_eventhub_receiver" {
+  count                = var.event_hub_id != "" ? 1 : 0
+  scope                = var.event_hub_id
+  role_definition_name = "Azure Event Hubs Data Receiver"
   principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
   principal_type       = "ServicePrincipal"
 }
