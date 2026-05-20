@@ -8,6 +8,8 @@
 # Dependencies:
 #   - networking : provides the resource group, VNet ID, subnet IDs
 #   - storage    : provides the images storage account ID and container name
+#   - eventhub   : provides the Event Hub namespace FQDN, hub name, consumer
+#                  group, and hub resource ID for the Event Hub trigger
 #
 # Optional inputs (set when the corresponding resources are created):
 #   - cosmos_db_account_id / cosmos_db_account_uri
@@ -58,6 +60,24 @@ dependency "storage" {
   mock_outputs_merge_strategy_with_state  = "shallow"
 }
 
+# ---------------------------------------------------------------------------
+# Event Hub dependency – namespace FQDN, hub name, and consumer group used
+# to configure the function app's Event Hub trigger (identity-based, no SAS).
+# Apply the eventhub unit first, then re-apply compute to activate the trigger.
+# ---------------------------------------------------------------------------
+dependency "eventhub" {
+  config_path = "../eventhub"
+
+  mock_outputs = {
+    eventhub_namespace_fqdn      = "evhns-poc-mock.servicebus.windows.net"
+    eventhub_name                = "evh-images-mock"
+    eventhub_consumer_group_name = "fn-consumer-mock"
+    eventhub_id                  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-mock/providers/Microsoft.EventHub/namespaces/evhns-mock/eventhubs/evh-images-mock"
+  }
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "init", "fmt"]
+  mock_outputs_merge_strategy_with_state  = "shallow"
+}
+
 inputs = {
   rg_id    = dependency.networking.outputs.resource_group_id
   rg_name  = dependency.networking.outputs.resource_group_name
@@ -72,6 +92,12 @@ inputs = {
   images_storage_account_id   = dependency.storage.outputs.storage_account_id
   images_storage_account_name = dependency.storage.outputs.storage_account_name
   images_container_name       = dependency.storage.outputs.container_name
+
+  # Event Hub (from the eventhub unit) – identity-based trigger, no SAS
+  event_hub_namespace_fqdn = dependency.eventhub.outputs.eventhub_namespace_fqdn
+  event_hub_name           = dependency.eventhub.outputs.eventhub_name
+  event_hub_consumer_group = dependency.eventhub.outputs.eventhub_consumer_group_name
+  event_hub_id             = dependency.eventhub.outputs.eventhub_id
 
   # ---------------------------------------------------------------------------
   # Cosmos DB – uncomment and populate when the Cosmos DB unit is provisioned

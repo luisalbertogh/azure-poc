@@ -66,3 +66,10 @@ az provider register --namespace Microsoft.App --wait
 ```
 
 More information on resource providers [here](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types).
+
+### Issue with "azurerm_role_assignment" resources
+
+To assing roles, the pipeline service principle needs `
+Role Based Access Control Administrator` permissions on the resource group (or the storage account, etc) where the permissions must be granted. See [here](https://learn.microsoft.com/es-es/azure/role-based-access-control/role-assignments-portal):
+
+![Image](./pics/rbac_permissions.PNG)

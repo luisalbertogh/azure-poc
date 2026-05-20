@@ -138,3 +138,41 @@ variable "instance_memory_in_mb" {
     error_message = "instance_memory_in_mb must be one of: 512, 2048, 4096."
   }
 }
+
+# ==============================================================================
+# Event Hub – optional, resolved when the eventhub unit is provisioned
+# ==============================================================================
+variable "event_hub_namespace_fqdn" {
+  type        = string
+  description = <<-EOT
+    Fully qualified domain name of the Event Hubs Namespace
+    (e.g. evhns-poc-dev.servicebus.windows.net). Set as the
+    EventHubConnection__fullyQualifiedNamespace app setting so the function
+    runtime connects via managed identity (no SAS connection strings).
+    Leave empty until the eventhub unit is provisioned.
+  EOT
+  default     = ""
+}
+
+variable "event_hub_name" {
+  type        = string
+  description = "Name of the Event Hub. Passed to the function as the EVENT_HUB_NAME app setting."
+  default     = ""
+}
+
+variable "event_hub_consumer_group" {
+  type        = string
+  description = "Name of the dedicated Event Hub consumer group for this function. Passed as EVENT_HUB_CONSUMER_GROUP."
+  default     = "$Default"
+}
+
+variable "event_hub_id" {
+  type        = string
+  description = <<-EOT
+    Resource ID of the Event Hub. When provided, the function identity is
+    granted the built-in \"Azure Event Hubs Data Receiver\" role scoped to
+    this specific hub (principle of least privilege).
+    Leave empty until the eventhub unit is provisioned.
+  EOT
+  default     = ""
+}
